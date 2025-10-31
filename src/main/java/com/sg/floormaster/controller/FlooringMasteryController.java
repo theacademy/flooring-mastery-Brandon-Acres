@@ -1,7 +1,14 @@
 package com.sg.floormaster.controller;
 
+import com.sg.floormaster.dao.FlooringMasteryPersistenceException;
+import com.sg.floormaster.model.Order;
+import com.sg.floormaster.service.FlooringMasteryDuplicateOrderException;
+import com.sg.floormaster.service.FlooringMasteryInvalidInputException;
 import com.sg.floormaster.service.FlooringMasteryServiceLayer;
 import com.sg.floormaster.view.FlooringMasteryView;
+
+import java.time.LocalDate;
+import java.util.List;
 
 
 public class FlooringMasteryController {
@@ -30,14 +37,14 @@ public class FlooringMasteryController {
                 try {
                     switch(menuSelection) {
                         case 1:
-                            throw new UnsupportedOperationException("To Do: Display Orders.");
-                            // break;
+                            displayOrders();
+                            break;
                         case 2:
-                            throw new UnsupportedOperationException("To Do: Add order.");
-                            // break;
+                            addOrder();
+                            break;
                         case 3:
-                            throw new UnsupportedOperationException("To Do: Edit Order.");
-                            // break;
+                            editOrder();
+                            break;
                         case 4:
                             throw new UnsupportedOperationException("To do: remove order");
                             // break;
@@ -58,7 +65,7 @@ public class FlooringMasteryController {
 
             }
         } catch (Exception e) { // Edit to be more specific exceptions as they apear.
-            // get view to display error message.
+            view.displayErrorMessage(e.getMessage());
         }
     }
 
@@ -67,11 +74,56 @@ public class FlooringMasteryController {
     }
 
     private void displayOrders() {
-        // To do
+        // get date input from user
+        LocalDate targetDate = view.getDateInput(null); // could search for date in past.
+
+        // If list is empty, display error message
+        List<Order> orders = service.getOrdersForDate(targetDate);
+
+        if (orders.isEmpty()) {
+            view.displayErrorMessage("There are no orders to view for that date.");
+        }
+
+        view.displayOrders(orders);
+
+
     }
 
     private void addOrder() {
-        // To do
+        // get new Valid order:
+        Order newValidOrder = view.getAddOrderInput(service.getTaxes(), service.getProducts());
+
+        // calculate costs
+        try {
+            service.calculateOrderCosts(newValidOrder, LocalDate.now()); // not necessary to check date now but we do
+        } catch (FlooringMasteryPersistenceException | FlooringMasteryInvalidInputException e) {
+            view.displayErrorMessage("ERROR: Could not calculate valid order costs, from input order.");
+            return; // return to main menu.
+        }
+
+        // display order summary
+        view.displayOrderSummary(newValidOrder);
+
+        // prompt confirmation
+        if (view.getConfirmation()) {
+            // user confirms to save changes
+            // get next order number
+            newValidOrder.setOrderNumber(service.getNextOrderNumber());
+            // try to persist to service layer
+            try {
+                service.addOrder(newValidOrder);
+            } catch (FlooringMasteryDuplicateOrderException e) {
+                view.displayErrorMessage("Error occurred, couldn't add to the order store:\n"
+                        + e.getMessage());
+                return; // don't continue, error occurred during persistence.
+            }
+            // display success message
+            view.displayAddOrderSuccess();
+        }
+        // otherwise
+        // display add order discarded.
+        view.displayAddOrderDiscarded();
+        // return to menu (do nothing, order will be collected from garbage).
     }
 
     private void editOrder() {
@@ -92,6 +144,6 @@ public class FlooringMasteryController {
     }
 
     private void unknownCommand() {
-        // to do
+        view.displayUnknownCommand();
     }
 }

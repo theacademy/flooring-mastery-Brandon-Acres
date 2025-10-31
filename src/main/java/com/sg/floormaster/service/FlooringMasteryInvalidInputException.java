@@ -4,4 +4,8 @@ public class FlooringMasteryInvalidInputException extends RuntimeException {
     public FlooringMasteryInvalidInputException(String message) {
         super(message);
     }
+
+    public FlooringMasteryInvalidInputException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
