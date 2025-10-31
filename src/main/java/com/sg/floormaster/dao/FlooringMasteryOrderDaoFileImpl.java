@@ -131,6 +131,12 @@ public class FlooringMasteryOrderDaoFileImpl implements FlooringMasteryOrderDao{
 
     @Override
     public Order removeOrder(LocalDate date, int orderId) {
+        // see if map exists for given date:
+        if (orders.get(date) != null && orders.get(date).get(orderId) != null) {
+            return orders.get(date).remove(orderId);
+        }
+
+        // otherwise no order was found, date may not yet exist, or order doesn't within date
         return null;
     }
 

@@ -7,12 +7,9 @@ import com.sg.floormaster.model.Tax;
 import com.sg.floormaster.service.FlooringMasteryInvalidInputException;
 import com.sg.floormaster.validation.OrderValidation;
 
-import javax.xml.transform.Source;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -180,8 +177,9 @@ public class FlooringMasteryView {
                 continue;
             }
 
-            // validate the date against current date:
+            // validate the date against date:
             try {
+                io.print("");
                 OrderValidation.validateOrderDate(orderDate, dateToValidateAgainst);
                 return orderDate;
             } catch (FlooringMasteryInvalidInputException e) {
@@ -209,7 +207,7 @@ public class FlooringMasteryView {
                 + ").");
 
         newOrder.setOrderDate(getDateInput(LocalDate.now()));
-        io.print("");
+
 
         // 2. Prompt for customer name:
         newOrder.setCustomerName(getCustomerNameInput());
@@ -391,17 +389,20 @@ public class FlooringMasteryView {
     }
 
     public void displayAddOrderDiscarded() {
-        // todo
+        io.print("Discarded new order. No changes made.");
+        io.print("");
     }
 
     // --- EDIT ORDER ----
     public void displayEditOrderBanner() {
-        // todo
+        displayOpenBanner("Edit Order:");
     }
 
     public int getOrderNumberInput() {
-        // todo
-        return 0;
+        // controller must handle validation of ID
+        int inputInt =  io.readInt("Enter an Order ID:");
+        io.print("");
+        return inputInt;
     }
 
     public Order getEditOrderInput(Order previousOrder, List<Tax> taxes, List<Product> products) {
@@ -417,23 +418,50 @@ public class FlooringMasteryView {
         } else {
             newEditedOrder.setCustomerName(optionalCustomerName);
         }
+        io.print("");
 
         // 2. Get state
         String optionalState = getOptionalStateInput(taxes, previousOrder.getState());
         // if empty, copy previous value, otherwise use new value
         if (optionalState.isEmpty()) {
             newEditedOrder.setState(previousOrder.getState());
+            newEditedOrder.setTaxRate(previousOrder.getTaxRate());
         } else {
+            // fetch new tax rate
             newEditedOrder.setState(optionalState);
+            // Then add the corresponding tax rate from taxes
+            // note null pointer exception may occur - but we have guaranteed that tax exists, so should not be null.
+            newEditedOrder.setTaxRate(taxes.stream()
+                    .filter(t -> t.getState()
+                            .equals(newEditedOrder.getState())).
+                    findFirst()
+                    .get()
+                    .getTaxRate()); // we know tax exists.
         }
+        io.print("");
 
         // 3. get product type
         String optionalProductType = getOptionalProductType(products, previousOrder.getProductType());
         if (optionalProductType.isEmpty()) {
             newEditedOrder.setProductType(previousOrder.getProductType());
+            newEditedOrder.setCostPerSquareFoot(previousOrder.getCostPerSquareFoot());
+            newEditedOrder.setLaborCostPerSquareFoot(previousOrder.getLaborCostPerSquareFoot());
         } else {
+            // fetch new product types from products
             newEditedOrder.setProductType(optionalProductType);
+            // add corresponding cost per square foot
+            Product newOrderProduct = products.stream()
+                    .filter(p -> p.getProductType()
+                            .equals(newEditedOrder.getProductType()))
+                    .findFirst()
+                    .get();
+
+            newEditedOrder.setCostPerSquareFoot(newOrderProduct.getCostPerSquareFoot());
+
+            // add corresponding labor cost per square foot.
+            newEditedOrder.setLaborCostPerSquareFoot(newOrderProduct.getLaborCostPerSquareFoot());
         }
+        io.print("");
 
         // 4. get area
         String optionalArea = getOptionalAreaInput(previousOrder.getArea());
@@ -442,7 +470,9 @@ public class FlooringMasteryView {
             } else {
                 // must convert string to BigDecimal
                 BigDecimal newArea = new BigDecimal(optionalArea).setScale(2, RoundingMode.HALF_UP);
+                newEditedOrder.setArea(newArea);
             }
+        io.print("");
 
 
         // return new partially complete order
@@ -535,16 +565,28 @@ public class FlooringMasteryView {
     }
 
     public void displayEditOrderSuccess() {
-        // todo
+        io.print("!!!! Successfully Saved Edited Order !!!!");
+        io.print("");
+    }
+
+    public void displayDiscardEditOrder() {
+        io.print("Edited order discarded, no changes made.");
+        io.print("");
     }
 
     // --- REMOVE ORDER -----
-    public void displayRemoveOrderBanner(String message) {
-        // todo
+    public void displayRemoveOrderBanner() {
+        displayOpenBanner("Remove Order:");
     }
 
     public void displayRemoveOrderSuccess() {
-        // todo
+        io.print("!!!! Successfully Removed Order !!!!");
+        io.print("");
+    }
+
+    public void displayRemoveOrderDiscardMessage() {
+        io.print("Remove order discarded, no changes made.");
+        io.print("");
     }
 
     public boolean getConfirmation() {

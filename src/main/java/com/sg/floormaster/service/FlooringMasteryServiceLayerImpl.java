@@ -92,7 +92,7 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
 
     @Override
     public Order removeOrder(LocalDate date, int orderId) {
-        return null;
+        return orderDao.removeOrder(date, orderId); // returns null if no order found, or order removed if successful.
     }
 
     @Override
