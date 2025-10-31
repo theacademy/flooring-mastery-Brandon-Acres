@@ -91,5 +91,12 @@ public interface FlooringMasteryServiceLayer {
     void calculateOrderCosts(Order order, LocalDate date)
             throws FlooringMasteryInvalidInputException,
             FlooringMasteryPersistenceException;
+
+
+    /**
+     * Saves current order data stored in memory, throws persistence exception if error occurs when trying to persist data.
+     * @throws FlooringMasteryPersistenceException if error occurs when trying to persist orders.
+     */
+    void saveOrders() throws FlooringMasteryPersistenceException;
 }
 

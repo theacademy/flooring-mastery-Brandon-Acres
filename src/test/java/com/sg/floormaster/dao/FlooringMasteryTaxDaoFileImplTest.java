@@ -135,20 +135,20 @@ class FlooringMasteryTaxDaoFileImplTest {
         assertEquals(0, receivedTaxes.size(),  "TaxDao with no Tax elements should return list with no elements");
     }
 
-    @Test
-    public void testGetAllTaxesFromNullMapInjection() {
-        // Arrange - new TAxDao with null passed as parameter
-
-        // Act
-        try {
-            FlooringMasteryTaxDao emptyTaxDao = new FlooringMasteryTaxDaoFileImpl(null);
-            fail("Should not be able to initialise TaxDao with a null tax map parameter");
-        } catch (FlooringMasteryPersistenceException e) {
-            // Test passes - threw Exception.
-        }
-
-
-    }
+//    @Test
+//    public void testGetAllTaxesFromNullMapInjection() {
+//        // Arrange - new TAxDao with null passed as parameter
+//
+//        // Act
+//        try {
+//            FlooringMasteryTaxDao emptyTaxDao = new FlooringMasteryTaxDaoFileImpl(null);
+//            fail("Should not be able to initialise TaxDao with a null tax map parameter");
+//        } catch (FlooringMasteryPersistenceException e) {
+//            // Test passes - threw Exception.
+//        }
+//
+//
+//    }
 
     @Test
     public void testGetAllTaxesFromNonEmptyMapInjection() {

@@ -77,4 +77,9 @@ public interface FlooringMasteryOrderDao {
      */
     Order removeOrder(LocalDate date, int orderId);
 
+    /**
+     * Persists curent order information to storage.
+     * @throws FlooringMasteryPersistenceException if error occurs while trying to persist data.
+     */
+    void saveOrders() throws FlooringMasteryPersistenceException;
 }

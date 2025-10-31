@@ -611,11 +611,11 @@ public class FlooringMasteryView {
     // display export data success
 
     public void displayExitMessage() {
-        // todo
+        io.print("Saved changes. Exiting.");
     }
 
     public void displayUnknownCommand() {
-        // todo
+        io.print("Unknown Command. Try again.");
     }
 
 

@@ -2,10 +2,12 @@ package com.sg.floormaster.dao;
 
 import com.sg.floormaster.model.Tax;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FlooringMasteryTaxDaoFileImpl implements FlooringMasteryTaxDao {
@@ -16,15 +18,25 @@ public class FlooringMasteryTaxDaoFileImpl implements FlooringMasteryTaxDao {
     private Map<String, Tax> allTaxes;
 
     // Implement when adding persistence
-//    private final TAX_FILE;
-//    private final DELIMITER;
+    private final String TAX_FILE;
+    private final String DELIMITER = ",";
 
     public FlooringMasteryTaxDaoFileImpl(Map<String, Tax> taxes) throws FlooringMasteryPersistenceException{
         validateAllTaxes(taxes);
         this.allTaxes = taxes;
+        this.TAX_FILE = "Data/Taxes.txt";
     }
 
-    public FlooringMasteryTaxDaoFileImpl() {}
+    public FlooringMasteryTaxDaoFileImpl() {
+        this("Data/Taxes.txt");
+    }
+
+    public FlooringMasteryTaxDaoFileImpl(String taxTextFile) throws FlooringMasteryPersistenceException {
+        this.TAX_FILE = taxTextFile;
+        allTaxes = new HashMap<>();
+        loadFile();
+        validateAllTaxes(allTaxes);
+    }
 
 
     @Override
@@ -45,8 +57,8 @@ public class FlooringMasteryTaxDaoFileImpl implements FlooringMasteryTaxDao {
         // verify that all state names are also unique
         HashSet<String> stateNames = new HashSet<>();
         for (Tax t : taxes.values()) {
-            // Ensure that the state abbreviation key points to a tax object with the same state abbreviation.
-            if (!t.equals(taxes.get(t.getStateAbr()))) {
+            // Ensure that the state name key points to a tax object with the same state name.
+            if (!t.equals(taxes.get(t.getState()))) {
                 throw new FlooringMasteryPersistenceException("Cannot have a state abbreviation mapping to a Tax" +
                         " with a different abbreviation");
             }
@@ -57,8 +69,81 @@ public class FlooringMasteryTaxDaoFileImpl implements FlooringMasteryTaxDao {
 
     }
 
-    // implement when adding persistence.
-    // private void loadFile()
-        // if when adding value to the map - returns a value from put, throw PersistenceException
-        // makes call to validateAllTaxes - pass this.allTaxes
+
+    private void loadFile() throws FlooringMasteryPersistenceException{
+
+        // Tax file MUST have header line as first line of file qual to:
+        // State,StateName,TaxRate
+
+        // load file
+        Scanner scanner;
+
+        // open file
+        try {
+            // create scanner to read file
+            scanner = new Scanner(new BufferedReader(new FileReader(TAX_FILE)));
+        } catch (FileNotFoundException e) {
+            throw new FlooringMasteryPersistenceException("Couldn't load tax data into memory.", e);
+        }
+
+        // current line holds most recent line read from file
+        String currentLine;
+
+        // hold current most recent unmarshalled Tax
+        Tax currentTax;
+
+        // if file is empty - return persistence exception - should contain header:
+        if (!scanner.hasNextLine()) {
+            throw new FlooringMasteryPersistenceException("Invalid tax file - no header line found.");
+        }
+
+        // Verify that header is correct
+
+        String headerLine = scanner.nextLine();
+        String[] headers = headerLine.split(DELIMITER);
+        if (headers.length != 3 || !(headers[0].equals("State")
+            && headers[1].equals("StateName")
+            && headers[2].equals("TaxRate"))) {
+            throw new FlooringMasteryPersistenceException("Invalid Tax File Header.");
+
+        }
+
+
+        // iterate over TAX_FILE body decode each line into tax
+        while (scanner.hasNextLine()) {
+            currentLine = scanner.nextLine();
+            // unmarshall line into tax
+            currentTax = unmarshallTax(currentLine);
+
+            // if tax is null throw exception - invalid tax
+            if (currentTax == null) {
+                throw new FlooringMasteryPersistenceException("Invalid tax read in tax file.");
+            }
+            // otherwise add to memory
+            // use state name as key
+            allTaxes.put(currentTax.getState(), currentTax);
+        }
+
+        // close scanner
+        scanner.close();
+    }
+
+    private Tax unmarshallTax(String taxAsText) {
+        /*
+         * Expected input format for taxAsText entry in tax file.
+         * <taxCode>,<stateName>,<taxRate>
+         * We enforce taxCode to be uppercase, and taxRate to have scale 2.
+         */
+        // if empty, return null
+        if (taxAsText == null || taxAsText.isEmpty()) return null;
+
+        String[] taxPropertiesAsText = taxAsText.split(DELIMITER);
+
+        // assume valid format
+
+        return new Tax(taxPropertiesAsText[1], taxPropertiesAsText[0],
+                new BigDecimal(taxPropertiesAsText[2]).setScale(2, RoundingMode.HALF_UP));
+
+    }
+
 }

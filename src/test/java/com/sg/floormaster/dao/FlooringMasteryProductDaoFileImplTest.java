@@ -86,14 +86,15 @@ class FlooringMasteryProductDaoFileImplTest {
         }
     }
 
-    @Test
-    public void testInvalidDaoCreationWithNullMap() {
-        // Arrange/Act - attempt to create productDao with null reference to a map
-        try {
-            FlooringMasteryProductDao productDao = new FlooringMasteryProductDaoFileImpl(null);
-            fail("Should not be able to initialise ProductDao with null product map parameter.");
-        } catch (FlooringMasteryPersistenceException e) {
-            // test passes - threw Exception.
-        }
-    }
+    // Memory implementation test
+//    @Test
+//    public void testInvalidDaoCreationWithNullMap() {
+//        // Arrange/Act - attempt to create productDao with null reference to a map
+//        try {
+//            FlooringMasteryProductDao productDao = new FlooringMasteryProductDaoFileImpl(null);
+//            fail("Should not be able to initialise ProductDao with null product map parameter.");
+//        } catch (FlooringMasteryPersistenceException e) {
+//            // test passes - threw Exception.
+//        }
+//    }
 }

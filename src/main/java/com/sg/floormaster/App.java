@@ -31,42 +31,15 @@ public class App {
         // instantiate view and wire IO to implement
         FlooringMasteryView myView = new FlooringMasteryView(myIo);
 
-        // instantiate Daos
-        // Tax
-        Map<String, Tax> taxTest = new HashMap<>();
-        Tax t1 = new Tax("Texas", "TX", new BigDecimal("12.00").setScale(2, RoundingMode.HALF_UP));
-        taxTest.put(t1.getStateAbr(), t1);
-        FlooringMasteryTaxDao taxDao = new FlooringMasteryTaxDaoFileImpl(taxTest);
 
-        // Product
-        Map<String, Product> productTest = new HashMap<>();
-        Product p1 = new Product("Carpet",
-                    new BigDecimal("11.2").setScale(2, RoundingMode.HALF_UP),
-                    new BigDecimal("11.55").setScale(2, RoundingMode.HALF_UP));
-        productTest.put(p1.getProductType(), p1);
-        FlooringMasteryProductDao productDao = new FlooringMasteryProductDaoFileImpl(productTest);
 
-        Map<LocalDate, Map<Integer, Order>> memoryOrders = new HashMap<>();
-        // create a single order entry
-        Order o1 = new Order();
-        o1.setOrderNumber(0);
-        o1.setOrderDate(LocalDate.now());
-        o1.setCustomerName("Doob");
-        o1.setState("California");
-        o1.setTax(new BigDecimal("11.2").setScale(2, RoundingMode.HALF_UP));
-        o1.setProductType("Yarn Ball");
-        o1.setArea(new BigDecimal("1113.2").setScale(2, RoundingMode.HALF_UP));
-        o1.setCostPerSquareFoot(new BigDecimal("1.2").setScale(2, RoundingMode.HALF_UP));
-        o1.setLaborCostPerSquareFoot(new BigDecimal("77.11").setScale(2, RoundingMode.HALF_UP));
-        o1.setMaterialCost(new BigDecimal("91.1").setScale(2, RoundingMode.HALF_UP));
-        o1.setLaborCost(new BigDecimal("1113.2").setScale(2, RoundingMode.HALF_UP));
-        o1.setTax(new BigDecimal("666.2").setScale(2, RoundingMode.HALF_UP));
-        o1.setTotal(new BigDecimal("8811.22").setScale(2, RoundingMode.HALF_UP));
+        // use tax file.
+        FlooringMasteryTaxDao taxDao = new FlooringMasteryTaxDaoFileImpl("Data/Taxes.txt");
 
-        Map<Integer, Order> doobDayOrders = new HashMap<>();
-        doobDayOrders.put(o1.getOrderNumber(), o1);
-        memoryOrders.put(o1.getOrderDate(), doobDayOrders);
-        FlooringMasteryOrderDao orderDao = new FlooringMasteryOrderDaoFileImpl(memoryOrders);
+        // use products file
+        FlooringMasteryProductDao productDao = new FlooringMasteryProductDaoFileImpl("Data/Products.txt");
+
+        FlooringMasteryOrderDao orderDao = new FlooringMasteryOrderDaoFileImpl("Orders");
 
         // instantiate service with daos wired
         // for now service not implemented

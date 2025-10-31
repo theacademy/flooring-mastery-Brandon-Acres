@@ -35,37 +35,35 @@ public class FlooringMasteryController {
                 // execute option basd on menu selection
 
                 // REMOVE: TRY-CATCH here when all user stories have been implemented
-                try {
-                    switch(menuSelection) {
-                        case 1:
-                            displayOrders();
-                            break;
-                        case 2:
-                            addOrder();
-                            break;
-                        case 3:
-                            editOrder();
-                            break;
-                        case 4:
-                            removeOrder();
-                            break;
-                        case 5:
-                            throw new UnsupportedOperationException("To Do: Export All Data");
-                            // break;
-                        case 6:
-                            keepGoing = false;
-                            throw new UnsupportedOperationException("To Do: Quit");
-                        default:
-                            unknownCommand();
-
-                    }
-                } catch (UnsupportedOperationException e) {
-                    // get view to display error message
-                    view.displayErrorMessage(e.getMessage());
+                switch(menuSelection) {
+                    case 1:
+                        displayOrders();
+                        break;
+                    case 2:
+                        addOrder();
+                        break;
+                    case 3:
+                        editOrder();
+                        break;
+                    case 4:
+                        removeOrder();
+                        break;
+                    case 5:
+                        exportData();
+                        break;
+                    case 6:
+                        keepGoing = false;
+                        saveOrders();
+                        exitMessage();
+                        break;
+                    default:
+                        unknownCommand();
                 }
-
             }
-        } catch (Exception e) { // Edit to be more specific exceptions as they apear.
+        } catch (FlooringMasteryPersistenceException e) {
+            view.displayErrorMessage(e.getMessage());
+        }
+        catch (Exception e) { // Edit to be more specific exceptions as they apear.
             view.displayErrorMessage(e.getMessage());
         }
     }
@@ -201,6 +199,7 @@ public class FlooringMasteryController {
 
             // otherwise Order was successful
             view.displayEditOrderSuccess();
+            return;
         }
 
         // If confirmation was negative, display discard banner
@@ -266,10 +265,15 @@ public class FlooringMasteryController {
      }
 
     private void exitMessage() {
-        // To do
+        view.displayExitMessage();
     }
 
     private void unknownCommand() {
         view.displayUnknownCommand();
+    }
+
+    private void saveOrders() throws FlooringMasteryPersistenceException {
+        // attempts to write currently stored data to files:
+        service.saveOrders();
     }
 }

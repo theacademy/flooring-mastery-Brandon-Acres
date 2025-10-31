@@ -26,7 +26,7 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
     // Adjust to autowire/spring dependency:
     public FlooringMasteryServiceLayerImpl() {
         orderDao = new FlooringMasteryOrderDaoFileImpl();
-        taxDao = new FlooringMasteryTaxDaoFileImpl();
+        taxDao = new FlooringMasteryTaxDaoFileImpl("Data/Taxes.txt");
         productDao = new FlooringMasteryProductDaoFileImpl();
     }
 
@@ -151,5 +151,9 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
         // now valid order ready to be persisted.
     }
 
+    @Override
+    public void saveOrders() throws FlooringMasteryPersistenceException {
+        orderDao.saveOrders();
+    }
 
 }
