@@ -2,6 +2,8 @@ package com.sg.floormaster.view;
 
 import com.sg.floormaster.model.Order;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,12 +18,10 @@ class FlooringMasteryViewTest {
 
     // add dependency injection later:
     public FlooringMasteryViewTest() {
-        this.view = new FlooringMasteryView(new UserIOConsoleImpl());
+        // get application context
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        this.view = ctx.getBean("view", FlooringMasteryView.class);
     }
-
-//    public FlooringMasteryViewTest(FlooringMasteryView view) {
-//        this.view = view;
-//    }
 
     @Test
     public void testDisplayOrders() {

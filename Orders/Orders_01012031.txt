@@ -1,3 +1,4 @@
 OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total
 4,Dhani,Kentucky,6.00,Wood,190.00,5.15,4.75,978.50,902.50,112.86,1993.86
 5,Brandon* A,Washington,9.25,Laminate,210.00,1.75,2.10,367.50,441.00,72.77,881.27
+6,Java,Texas,4.45,Tile,101.10,3.50,4.15,353.85,419.57,30.94,804.36

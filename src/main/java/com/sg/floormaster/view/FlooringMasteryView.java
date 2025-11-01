@@ -320,7 +320,7 @@ public class FlooringMasteryView {
         try {
             String capitalisedState = stateInput.substring(0, 1).toUpperCase() + stateInput.substring(1);;
             return OrderValidation.validateState(taxes, capitalisedState);
-        } catch (FlooringMasteryInvalidInputException | FlooringMasteryPersistenceException e) {
+        } catch (FlooringMasteryInvalidInputException e) {
             throw new FlooringMasteryInvalidInputException("State Name wasn't found. Try again.\n", e);
         }
     }
@@ -364,7 +364,8 @@ public class FlooringMasteryView {
         }
     }
 
-    private BigDecimal getValidArea(String areaInput) {
+    private BigDecimal getValidArea(String areaInput) throws FlooringMasteryInvalidInputException,
+                                                                NumberFormatException {
         // Validate input - greater than min area.
         try {
             // try to convert to big Decimal

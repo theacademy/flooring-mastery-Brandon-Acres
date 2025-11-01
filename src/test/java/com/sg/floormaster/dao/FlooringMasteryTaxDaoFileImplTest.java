@@ -27,17 +27,17 @@ class FlooringMasteryTaxDaoFileImplTest {
         Tax texas = new Tax("Texas",
                    "TX",
                         new BigDecimal("25").setScale(2, RoundingMode.HALF_UP));
-        nonEmptyTaxMap.put(texas.getStateAbr(), texas);
+        nonEmptyTaxMap.put(texas.getState(), texas);
 
         Tax california = new Tax("California",
                                 "CA",
                                 new BigDecimal("6.00").setScale(2, RoundingMode.HALF_UP));
-        nonEmptyTaxMap.put(california.getStateAbr(), california);
+        nonEmptyTaxMap.put(california.getState(), california);
 
         Tax kentucky = new Tax("Kentucky",
                               "KY",
                                 new BigDecimal("9.25").setScale(2, RoundingMode.HALF_UP));
-        nonEmptyTaxMap.put(kentucky.getStateAbr(), kentucky);
+        nonEmptyTaxMap.put(kentucky.getState(), kentucky);
 
         // Act and assert - ensure that no exception is thrown when constructing taxDao with map injected in constructor
         try {
@@ -160,17 +160,17 @@ class FlooringMasteryTaxDaoFileImplTest {
         Tax texas = new Tax("Texas",
                 "TX",
                 new BigDecimal("25").setScale(2, RoundingMode.HALF_UP));
-        nonEmptyTaxMap.put(texas.getStateAbr(), texas);
+        nonEmptyTaxMap.put(texas.getState(), texas);
 
         Tax california = new Tax("California",
                 "CA",
                 new BigDecimal("6.00").setScale(2, RoundingMode.HALF_UP));
-        nonEmptyTaxMap.put(california.getStateAbr(), california);
+        nonEmptyTaxMap.put(california.getState(), california);
 
         Tax kentucky = new Tax("Kentucky",
                 "KY",
                 new BigDecimal("9.25").setScale(2, RoundingMode.HALF_UP));
-        nonEmptyTaxMap.put(kentucky.getStateAbr(), kentucky);
+        nonEmptyTaxMap.put(kentucky.getState(), kentucky);
 
         // Act:
         // Create TaxDao
@@ -194,4 +194,149 @@ class FlooringMasteryTaxDaoFileImplTest {
 
     }
 
+    // --------- Test Instantiation from Tax files ---------------
+
+    @Test
+    public void testCreateTaxDaoWithValidTaxFile() {
+        // try to instantiate dao with valid tax file "src/test/resources/Data/Taxes.txt"
+
+        try {
+            FlooringMasteryTaxDao taxDao =
+                    new FlooringMasteryTaxDaoFileImpl("src/test/resources/Data/Taxes.txt");
+        } catch (FlooringMasteryPersistenceException e) {
+            fail("Tax Dao should be able to parse valid tax file Taxes.txt");
+        }
+    }
+
+    @Test
+    public void testCreateTaxDaoWithEmptyTaxesFile() {
+        // try to instantiate tax dao with tax file containing valid header and no tax entries.
+        // source: "src/test/resources/Data/EmptyTaxes.txt"
+        // should be able to create one - would just have empty list of taxes.
+
+        try {
+            FlooringMasteryTaxDao taxDao =
+                    new FlooringMasteryTaxDaoFileImpl("src/test/resources/Data/EmptyTaxes.txt");
+        } catch (FlooringMasteryPersistenceException e) {
+            fail("Tax Dao should be able to parse valid empty tax file EmptyTaxes.txt");
+        }
+
+    }
+
+    @Test
+    public void testCreateTaxDaoWithEmptyFile() {
+        // should not be able to create taxDao from empty file - invalid header.
+        try {
+            FlooringMasteryTaxDao taxDao =
+                    new FlooringMasteryTaxDaoFileImpl("src/test/resources/Data/EmptyFile.txt");
+            fail("Should not be able to create tax dao from empty file.");
+        } catch (FlooringMasteryPersistenceException e) {
+            // passes - couldn't create dao
+        }
+    }
+
+    @Test
+    public void testCreateTaxWithInvalidHeaderFile() {
+        // try to instantiate tax dao with invalid headers
+        // should return persistence exception - tax file must contain valid header.
+        // sources: "src/test/resources/Data/HeaderTooShortTaxes.txt"
+        //          "src/test/resources/Data/InvalidHeaderTaxes.txt"
+
+        try {
+            FlooringMasteryTaxDao validTaxDao =
+                    new FlooringMasteryTaxDaoFileImpl("src/test/resources/Data/HeaderTooShortTaxes.txt");
+            fail("TaxDao shouldn't be able to be instantiated from header without full list of attributes.");
+        } catch (FlooringMasteryPersistenceException e) {
+            // passes test - shouldn't be able to create dao.
+        }
+
+        try {
+            FlooringMasteryTaxDao validTaxDao =
+                    new FlooringMasteryTaxDaoFileImpl("src/test/resources/Data/InvalidHeaderTaxes.txt");
+            fail("TaxDao shouldn't be able to be instantiated from header without misspelt header.");
+        } catch (FlooringMasteryPersistenceException e) {
+            // passes test - shouldn't be able to create dao.
+        }
+    }
+
+    @Test
+    public void testCreateTaxDaoFromNonExistentFile() {
+        // try to instantiate tax dao from non-existent file
+        // should return persistence exception.
+
+        try {
+            FlooringMasteryTaxDao invalidTaxDao =
+                    new FlooringMasteryTaxDaoFileImpl("src/test/resources/Data/FileDoesNotExist.txt");
+            fail("TaxDao shouldn't be able to be instantiated from non-existent file.");
+        } catch (FlooringMasteryPersistenceException e) {
+            // passes test - shouldn't be able to create dao.
+        }
+    }
+
+    // ---------- Test validateTaxes() -------------
+    @Test
+    public void testUniqueStateCodes() {
+        // if tax file contains entries with duplicate state codes, should cause exception
+
+        try {
+            FlooringMasteryTaxDao invaildDao =
+                    new FlooringMasteryTaxDaoFileImpl("src/test/resources/Data/DuplicateStateCodeTaxes.txt");
+            fail("tax file with duplicate tax code appearing in different state entries should not be valid.");
+        } catch (FlooringMasteryPersistenceException e) {
+            // passes
+        }
+    }
+
+    // --------- test getAllTaxes() --------------
+    @Test
+    public void testGetAllTaxesFromEmptyTaxFile() {
+        // test list returned from getAllTaxes() when supplied with tax file with valid header but no entries
+        // has size 0.
+
+        FlooringMasteryTaxDao taxDao = null;
+        try {
+            taxDao = new FlooringMasteryTaxDaoFileImpl("src/test/resources/Data/EmptyTaxes.txt");
+        } catch (FlooringMasteryPersistenceException e) {
+            fail("tax Dao should be created from tax file with valid header and no entries.");
+        }
+
+        // get all taxes
+        List<Tax> receivedTaxes = taxDao.getAllTaxes();
+
+        // assert size is 0
+        assertEquals(0, receivedTaxes.size(), "Empty tax file should result in empty tax list from dao.");
+    }
+
+    @Test
+    public void testGetAllTaxesFromNonEmptyTaxFile() {
+        // test that the taxes returned from TwoTaxes.txt are those we expect and that list size is 2.
+
+        Tax texas = new Tax("Texas",
+                "TX",
+                    new BigDecimal("4.45").setScale(2, RoundingMode.HALF_UP));
+
+        Tax washington = new Tax("Washington",
+                "WA",
+                    new BigDecimal("9.25").setScale(2, RoundingMode.HALF_UP));
+
+        FlooringMasteryTaxDao taxDao = null;
+
+        try {
+            taxDao =
+                    new FlooringMasteryTaxDaoFileImpl("src/test/resources/Data/TwoTaxes.txt");
+        } catch (FlooringMasteryPersistenceException e) {
+            fail("Dao should be created from non-empty TwoTaxes.txt.");
+        }
+
+        // Assert
+        // get taxes
+        List<Tax> receivedTaxes = taxDao.getAllTaxes();
+
+        // check returned list has size 2.
+        assertEquals(2, receivedTaxes.size(), "Tax list should be of size 2 from TwoTaxes.txt");
+
+        // check returned list contains expected tax objects
+        assertTrue(receivedTaxes.contains(texas), "returned list should contain texas.");
+        assertTrue(receivedTaxes.contains(washington), "returned list should contain washington.");
+    }
 }

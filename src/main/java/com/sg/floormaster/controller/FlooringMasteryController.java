@@ -16,7 +16,6 @@ public class FlooringMasteryController {
     private FlooringMasteryView view;
     private FlooringMasteryServiceLayer service;
 
-    // Currently built-in dependency injection
     public FlooringMasteryController(FlooringMasteryView view, FlooringMasteryServiceLayer service) {
         this.view = view;
         this.service = service;
@@ -33,8 +32,6 @@ public class FlooringMasteryController {
                 menuSelection = getMenuSelection();
 
                 // execute option basd on menu selection
-
-                // REMOVE: TRY-CATCH here when all user stories have been implemented
                 switch(menuSelection) {
                     case 1:
                         displayOrders();
@@ -60,10 +57,7 @@ public class FlooringMasteryController {
                         unknownCommand();
                 }
             }
-        } catch (FlooringMasteryPersistenceException e) {
-            view.displayErrorMessage(e.getMessage());
-        }
-        catch (Exception e) { // Edit to be more specific exceptions as they apear.
+        } catch (Exception e) {
             view.displayErrorMessage(e.getMessage());
         }
     }
@@ -122,6 +116,7 @@ public class FlooringMasteryController {
             }
             // display success message
             view.displayAddOrderSuccess();
+            return;
         }
         // otherwise
         // display add order discarded.
@@ -272,8 +267,13 @@ public class FlooringMasteryController {
         view.displayUnknownCommand();
     }
 
-    private void saveOrders() throws FlooringMasteryPersistenceException {
+    private void saveOrders() {
         // attempts to write currently stored data to files:
-        service.saveOrders();
+        try {
+            service.saveOrders();
+        } catch (FlooringMasteryPersistenceException e) {
+            view.displayErrorMessage(e.getMessage());
+        }
+
     }
 }

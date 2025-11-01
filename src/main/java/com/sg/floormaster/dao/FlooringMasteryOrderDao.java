@@ -52,7 +52,7 @@ public interface FlooringMasteryOrderDao {
     /**
      * Returns list of Order objects for the specified date.
      *
-     * Returns null if no orders are found for the specified date
+     * Returns empty list if no orders are found for the specified date
      * @param date order date of which all returned orders have.
      * @return
      */
@@ -61,8 +61,10 @@ public interface FlooringMasteryOrderDao {
     /**
      * Returns nested Map containing all orders. The returned outer map's keys represent order dates
      * and the inner map's keys are orderIDs.
+     * Note this is NOT PREFERRED method of interacting with orders as it allows for direct manipulation of persistence layer.
      * @return Nested map containing all order objects. Outer Map's keys are order LocalDate,
      * inner map's keys are order ID.
+     *
      */
     Map<LocalDate, Map<Integer, Order>> getAllOrders();
 

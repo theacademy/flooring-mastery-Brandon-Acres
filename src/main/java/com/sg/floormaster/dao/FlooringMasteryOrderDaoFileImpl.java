@@ -58,12 +58,16 @@ public class FlooringMasteryOrderDaoFileImpl implements FlooringMasteryOrderDao{
             largestOrderNumber = 0;
         }
 
-        // otherwise: create List<List<Int>>, iterate through each and find max.
+        // otherwise: create List<Set<Int>>, iterate through each and find max.
         int currentMax = -1;
-        List<Set<Integer>> orderNumbers = orders.values().stream().map((Map::keySet)).toList();
+        List<Set<Integer>> orderNumbers = orders.values().stream()
+                                            .filter(Objects::nonNull)
+                                            .map((Map::keySet)).toList();
 
         for (Set<Integer> s : orderNumbers) {
             List<Integer> sList = (new ArrayList<>(s));
+            // if set of order number is empty - no max value to obtain, skip to next list
+            if (s.isEmpty()) continue;
             sList.sort(Integer::compare); // ascending order.
             int sMax = sList.getLast(); // max value
             if (sMax > currentMax) {
@@ -94,7 +98,7 @@ public class FlooringMasteryOrderDaoFileImpl implements FlooringMasteryOrderDao{
         // note that date key may exist, but inner map could be null,
         //
         // in either case (date key not in outer map or key does exist but inner map is null),
-        // a new map containing the new object is set as the value for the outer map.
+        // a new map containing the new object is set as the value for the outer map's date key.
         if (orders.get(order.getOrderDate()) != null) {
             Map<Integer, Order> existingOrdersOnNewOrderDate = orders.get(order.getOrderDate());
 
@@ -140,13 +144,19 @@ public class FlooringMasteryOrderDaoFileImpl implements FlooringMasteryOrderDao{
     @Override
     public List<Order> getOrdersForDate(LocalDate date) {
         // Could convert to a stream?
+        // if the date doesn't exist as key in orders, return empty list.
+        // or if the date exists, but points to a null value.
+        if (orders.get(date) == null) {
+            return new ArrayList<>();
+        }
         return new ArrayList<>(orders.get(date).values());
     }
 
     @Override
     public Map<LocalDate, Map<Integer, Order>> getAllOrders() {
         // Returns a shallow copy so that no external layer can alter the Dao's structure.
-        // Note that the map should not be altered
+        // Note that the map should not be altered - internal maps and orders could be changed.
+        // not preferred method
         return Map.copyOf(orders);
     }
 

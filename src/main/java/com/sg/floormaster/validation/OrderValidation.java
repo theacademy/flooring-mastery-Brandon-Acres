@@ -131,7 +131,7 @@ public class OrderValidation {
      * @param taxes list of all valid tax objects.
      * @param orderState state name of the order to be validated.
      * @return orderState if a Tax object exists with given stateName.
-     * @throws FlooringMasteryPersistenceException if state name not valid.
+     * @throws FlooringMasteryInvalidInputException if state name not valid.
      */
     public static String validateState(List<Tax> taxes, String orderState) throws FlooringMasteryInvalidInputException {
         List<String> validStates = taxes.stream().map(Tax::getState).toList();

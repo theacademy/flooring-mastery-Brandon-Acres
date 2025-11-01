@@ -53,17 +53,17 @@ public class FlooringMasteryTaxDaoFileImpl implements FlooringMasteryTaxDao {
             throw new FlooringMasteryPersistenceException("Internal store of taxes cannot be null");
         }
 
-        // We are guaranteed all state codes are unique as allTaxes has a set of keys
-        // verify that all state names are also unique
-        HashSet<String> stateNames = new HashSet<>();
+        // We are guaranteed all state names are unique as allTaxes has a set of keys of state names
+        // verify that all state codes are also unique
+        HashSet<String> stateCodes = new HashSet<>();
         for (Tax t : taxes.values()) {
             // Ensure that the state name key points to a tax object with the same state name.
             if (!t.equals(taxes.get(t.getState()))) {
-                throw new FlooringMasteryPersistenceException("Cannot have a state abbreviation mapping to a Tax" +
-                        " with a different abbreviation");
+                throw new FlooringMasteryPersistenceException("Cannot have a state mapping to a Tax" +
+                        " with a different state name");
             }
-            if (!stateNames.add(t.getState())) {
-                throw new FlooringMasteryPersistenceException("Cannot have multiple tax entries with the same state name.");
+            if (!stateCodes.add(t.getStateAbr())) {
+                throw new FlooringMasteryPersistenceException("Cannot have multiple tax entries with the same state code.");
             }
         }
 
