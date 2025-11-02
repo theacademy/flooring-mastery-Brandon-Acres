@@ -7,7 +7,6 @@ import com.sg.floormaster.model.Tax;
 import com.sg.floormaster.service.FlooringMasteryDuplicateOrderException;
 import com.sg.floormaster.service.FlooringMasteryInvalidInputException;
 
-import javax.sound.sampled.Port;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -106,9 +105,9 @@ public class OrderValidation {
      * @throws FlooringMasteryInvalidInputException if customerName not valid.
      */
     public static String validateCustomerName(String customerName) throws FlooringMasteryInvalidInputException{
-        // if string is empty or null, throw invalidException
-        if (customerName == null || customerName.isEmpty()) {
-            throw new FlooringMasteryInvalidInputException("Customer name cannot be empty or null.");
+        // if string is empty, null or only whitespace, throw invalidException
+        if (customerName == null || customerName.isBlank()) {
+            throw new FlooringMasteryInvalidInputException("Customer name cannot be blank (empty or only whitespace) or null.");
         }
 
         // if the name contains anything except the allowed characters, throw exception.
@@ -125,21 +124,22 @@ public class OrderValidation {
     }
 
     /**
-     * Validates that a given state name matches a tax object in given list of tax objects.
-     * If Tax object exists with given state name, returns original orderState input.
+     * Validates that a given state code matches a tax object in given list of tax objects.
+     * If Tax object exists with given state name, returns corresponding state code.
      * Throws FlooringMasteryInvalidInputException if no such Tax Object found.
      * @param taxes list of all valid tax objects.
-     * @param orderState state name of the order to be validated.
-     * @return orderState if a Tax object exists with given stateName.
+     * @param orderState state code of the order to be validated.
+     * @return orderState if a Tax object exists with given state code.
      * @throws FlooringMasteryInvalidInputException if state name not valid.
      */
     public static String validateState(List<Tax> taxes, String orderState) throws FlooringMasteryInvalidInputException {
-        List<String> validStates = taxes.stream().map(Tax::getState).toList();
+        List<String> validStates = taxes.stream().map(Tax::getStateAbr).toList();
         if (!validStates.contains(orderState)) {
-            throw new FlooringMasteryInvalidInputException("State name wasn't found in store of states");
+            throw new FlooringMasteryInvalidInputException("State code wasn't found in store of states");
         }
 
         // otherwise return valid orderState
+
         return orderState;
     }
 
@@ -196,7 +196,7 @@ public class OrderValidation {
                                                     FlooringMasteryPersistenceException{
         // get the Tax object corresponding to this order's state
         List<Tax> taxesWithStateOfOrder = taxes.stream()
-                .filter((t) -> t.getState().equals(order.getState()))
+                .filter((t) -> t.getStateAbr().equals(order.getState()))
                 .toList();
         if (taxesWithStateOfOrder.size() > 1) {
             throw new FlooringMasteryPersistenceException("more than one Tax record found for given state.");

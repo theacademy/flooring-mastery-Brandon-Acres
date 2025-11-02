@@ -339,4 +339,17 @@ class FlooringMasteryTaxDaoFileImplTest {
         assertTrue(receivedTaxes.contains(texas), "returned list should contain texas.");
         assertTrue(receivedTaxes.contains(washington), "returned list should contain washington.");
     }
+
+    // ------------- Test parsing of tax entries ---------------
+    @Test
+    public void testFailureOfParsingInvalidTaxEntry() {
+        // test that tax file with invalid tax entry throws exception
+        try {
+            FlooringMasteryTaxDao taxDao =
+                    new FlooringMasteryTaxDaoFileImpl("src/test/resources/Data/InvalidTaxEntryTaxes.txt");
+            fail("Invalid tax entry should throw exception when trying to parse.");
+        } catch (FlooringMasteryPersistenceException e) {
+            // passes
+        }
+    }
 }

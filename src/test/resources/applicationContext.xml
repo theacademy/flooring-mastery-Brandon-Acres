@@ -22,4 +22,16 @@
         <constructor-arg ref="io"/>
     </bean>
 
+    <bean id="taxDaoStub" class="com.sg.floormaster.dao.FlooringMasteryTaxDaoStubImpl"/>
+
+    <bean id="productDaoStub" class="com.sg.floormaster.dao.FlooringMasteryProductDaoStubImpl"/>
+
+    <bean id="orderDaoStub" class="com.sg.floormaster.dao.FlooringMasteryOrderDaoStubImpl"/>
+
+    <bean id="serviceLayer" class="com.sg.floormaster.service.FlooringMasteryServiceLayerImpl">
+        <constructor-arg ref="orderDaoStub"/>
+        <constructor-arg ref="productDaoStub"/>
+        <constructor-arg ref="taxDaoStub"/>
+    </bean>
+
 </beans>

@@ -1,7 +1,6 @@
 package com.sg.floormaster.dao;
 
 import com.sg.floormaster.model.Order;
-import com.sg.floormaster.service.FlooringMasteryInvalidInputException;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -26,12 +25,12 @@ public class FlooringMasteryOrderDaoFileImpl implements FlooringMasteryOrderDao{
     private int largestOrderNumber;
 
     // default constructor
-    public FlooringMasteryOrderDaoFileImpl() {
+    public FlooringMasteryOrderDaoFileImpl() throws FlooringMasteryPersistenceException {
         this("Orders");
 
     }
 
-    public FlooringMasteryOrderDaoFileImpl(String orderDirectory) {
+    public FlooringMasteryOrderDaoFileImpl(String orderDirectory) throws FlooringMasteryPersistenceException {
         orders = new HashMap<>();
         ORDER_FOLDER = orderDirectory;
 

@@ -218,7 +218,7 @@ public class FlooringMasteryView {
         // Then add the corresponding tax rate from taxes
         // note null pointer exception may occur - but we have guaranteed that tax exists, so should not be null.
         newOrder.setTaxRate(taxes.stream()
-                .filter(t -> t.getState()
+                .filter(t -> t.getStateAbr()
                 .equals(newOrder.getState())).
                 findFirst()
                 .get()
@@ -305,10 +305,10 @@ public class FlooringMasteryView {
     private String getStateInput(List<Tax> taxes) {
         // until valid state name entered, prompt for input.
         while (true) {
-            // Validate input - first letter capitalised.
+            // Validate input
             try {
                 String stateInput = io.readString(
-                        "Enter State Name").strip().toLowerCase();
+                        "Enter State Code").strip().toUpperCase();
                 return getValidState(taxes, stateInput);
             } catch (FlooringMasteryInvalidInputException | FlooringMasteryPersistenceException e) {
                 io.print(e.getMessage());
@@ -318,10 +318,10 @@ public class FlooringMasteryView {
 
     private String getValidState(List<Tax> taxes, String stateInput) throws FlooringMasteryInvalidInputException{
         try {
-            String capitalisedState = stateInput.substring(0, 1).toUpperCase() + stateInput.substring(1);;
-            return OrderValidation.validateState(taxes, capitalisedState);
+            String upperCaseStateCode = stateInput.toUpperCase();
+            return OrderValidation.validateState(taxes, upperCaseStateCode);
         } catch (FlooringMasteryInvalidInputException e) {
-            throw new FlooringMasteryInvalidInputException("State Name wasn't found. Try again.\n", e);
+            throw new FlooringMasteryInvalidInputException("State code wasn't found. Try again.\n", e);
         }
     }
 
@@ -433,7 +433,7 @@ public class FlooringMasteryView {
             // Then add the corresponding tax rate from taxes
             // note null pointer exception may occur - but we have guaranteed that tax exists, so should not be null.
             newEditedOrder.setTaxRate(taxes.stream()
-                    .filter(t -> t.getState()
+                    .filter(t -> t.getStateAbr()
                             .equals(newEditedOrder.getState())).
                     findFirst()
                     .get()
@@ -507,7 +507,7 @@ public class FlooringMasteryView {
         while (true) {
             // get input
             String stateInput = io.readString(
-                    "Enter State Name (" + previousState + "):").strip().toLowerCase();
+                    "Enter State code (" + previousState + "):").strip().toLowerCase();
             // if empty or null, return empty string
             if (stateInput == null || stateInput.isEmpty()) {
                 return "";

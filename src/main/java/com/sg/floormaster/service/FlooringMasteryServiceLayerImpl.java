@@ -50,13 +50,18 @@ public class FlooringMasteryServiceLayerImpl implements FlooringMasteryServiceLa
     }
 
     @Override
-    public void addOrder(Order order) throws FlooringMasteryDuplicateOrderException {
+    public void addOrder(Order order) throws FlooringMasteryDuplicateOrderException,
+                                            FlooringMasteryInvalidInputException,
+                                            FlooringMasteryPersistenceException{
         // Check if there already exists an order with given id and orderDate.
         if (orderDao.getOrder(order.getOrderDate(), order.getOrderNumber()) != null) {
             throw new FlooringMasteryDuplicateOrderException(String.format(
                     "Cannot add order (date: %s, ID: %d), order already exists with same date and ID.",
                     order.getOrderDate().toString(), order.getOrderNumber()));
         }
+
+        // validate order
+        OrderValidation.validateOrder(order, getTaxes(), getProducts(), null);
 
         // Otherwise, can persist order - it should be valid from controller.
         orderDao.addOrder(order);

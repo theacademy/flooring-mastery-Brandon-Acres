@@ -113,6 +113,9 @@ public class FlooringMasteryController {
                 view.displayErrorMessage("Error occurred, couldn't add to the order store:\n"
                         + e.getMessage());
                 return; // don't continue, error occurred during persistence.
+            } catch (Exception e) {
+                view.displayErrorMessage(e.getMessage());
+                return;
             }
             // display success message
             view.displayAddOrderSuccess();

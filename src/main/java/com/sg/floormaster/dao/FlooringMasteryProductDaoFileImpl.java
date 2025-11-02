@@ -99,7 +99,7 @@ public class FlooringMasteryProductDaoFileImpl implements FlooringMasteryProduct
         scanner.close();
     }
 
-    private Product unmarshallProduct(String productAsText) {
+    private Product unmarshallProduct(String productAsText) throws FlooringMasteryPersistenceException {
         /*
          * Expected input format for productAsText:
          * <ProductType>,<costPerSquareFoot>,<laborCostPerSquareFoot>
@@ -110,11 +110,16 @@ public class FlooringMasteryProductDaoFileImpl implements FlooringMasteryProduct
 
         String[] productPropertiesAsText = productAsText.split(DELIMITER);
 
-        // assume valid format
+        // try to return valid product.
+        try {
+            return new Product(productPropertiesAsText[0],
+                    new BigDecimal(productPropertiesAsText[1]).setScale(2, RoundingMode.HALF_UP),
+                    new BigDecimal(productPropertiesAsText[2]).setScale(2, RoundingMode.HALF_UP));
+        } catch (Exception e) {
+            throw new FlooringMasteryPersistenceException("Could not parse product.", e);
+        }
 
-        return new Product(productPropertiesAsText[0],
-                new BigDecimal(productPropertiesAsText[1]).setScale(2, RoundingMode.HALF_UP),
-                new BigDecimal(productPropertiesAsText[2]).setScale(2, RoundingMode.HALF_UP));
+
     }
 
 

@@ -239,7 +239,19 @@ class FlooringMasteryProductDaoFileImplTest {
         }
     }
 
-
+    // ---------- Test parsing of product entries -------------
+    @Test
+    public void testFailureOfParsingInvalidProductEntry() {
+        // product file with invalid product entry should throw exception.
+        try {
+            FlooringMasteryProductDao productDao =
+                    new FlooringMasteryProductDaoFileImpl(
+                            "src/test/resources/Data/InvalidProductEntryProducts.txt");
+            fail("Invalid product entry should throw exception when trying to parse.");
+        } catch (FlooringMasteryPersistenceException e) {
+            // passes
+        }
+    }
 
 
 }

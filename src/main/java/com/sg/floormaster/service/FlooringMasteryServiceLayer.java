@@ -24,7 +24,9 @@ public interface FlooringMasteryServiceLayer {
      * already exists, throws FlooringMasteryDuplicateOrderException.
      * @param order new (already valid) order to add to the order store.
      */
-    void addOrder(Order order) throws FlooringMasteryDuplicateOrderException;
+    void addOrder(Order order) throws FlooringMasteryDuplicateOrderException,
+                                        FlooringMasteryInvalidInputException,
+                                            FlooringMasteryPersistenceException;
 
     /**
      * Retrieves an existing order from order store with given date and order ID.

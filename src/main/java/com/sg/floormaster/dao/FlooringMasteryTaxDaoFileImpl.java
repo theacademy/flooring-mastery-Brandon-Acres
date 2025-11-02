@@ -1,6 +1,7 @@
 package com.sg.floormaster.dao;
 
 import com.sg.floormaster.model.Tax;
+import com.sg.floormaster.service.FlooringMasteryInvalidInputException;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -128,7 +129,7 @@ public class FlooringMasteryTaxDaoFileImpl implements FlooringMasteryTaxDao {
         scanner.close();
     }
 
-    private Tax unmarshallTax(String taxAsText) {
+    private Tax unmarshallTax(String taxAsText) throws FlooringMasteryPersistenceException {
         /*
          * Expected input format for taxAsText entry in tax file.
          * <taxCode>,<stateName>,<taxRate>
@@ -139,10 +140,15 @@ public class FlooringMasteryTaxDaoFileImpl implements FlooringMasteryTaxDao {
 
         String[] taxPropertiesAsText = taxAsText.split(DELIMITER);
 
-        // assume valid format
+        // attempt to create tax object:
+        try {
+            return new Tax(taxPropertiesAsText[1], taxPropertiesAsText[0],
+                    new BigDecimal(taxPropertiesAsText[2]).setScale(2, RoundingMode.HALF_UP));
+        } catch (Exception e) {
+            throw new FlooringMasteryPersistenceException("Could not parse tax entry.", e);
+        }
 
-        return new Tax(taxPropertiesAsText[1], taxPropertiesAsText[0],
-                new BigDecimal(taxPropertiesAsText[2]).setScale(2, RoundingMode.HALF_UP));
+
 
     }
 
