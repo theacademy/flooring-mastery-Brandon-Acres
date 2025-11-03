@@ -442,6 +442,7 @@ public class FlooringMasteryView {
         io.print("");
 
         // 3. get product type
+        displayProductInformation(products);
         String optionalProductType = getOptionalProductType(products, previousOrder.getProductType());
         if (optionalProductType.isEmpty()) {
             newEditedOrder.setProductType(previousOrder.getProductType());

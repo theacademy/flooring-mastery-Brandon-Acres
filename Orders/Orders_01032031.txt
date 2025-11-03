@@ -1,2 +1,3 @@
 OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total
 7,Oregon* Sir,OR,9.90,Carpet,103.00,2.25,2.10,231.75,216.30,44.81,492.86
+9,Sebastian* Inc.,KY,6.00,Laminate,101.00,1.75,2.10,176.75,212.10,23.33,412.18

@@ -142,7 +142,6 @@ public class FlooringMasteryOrderDaoFileImpl implements FlooringMasteryOrderDao{
 
     @Override
     public List<Order> getOrdersForDate(LocalDate date) {
-        // Could convert to a stream?
         // if the date doesn't exist as key in orders, return empty list.
         // or if the date exists, but points to a null value.
         if (orders.get(date) == null) {
